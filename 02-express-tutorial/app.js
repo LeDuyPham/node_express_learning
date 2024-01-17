@@ -1,25 +1,27 @@
 const express = require('express');
 const app = express();
-const{products} = require('./data.js')
+let {people} = require('../data');
 
-app.get('/',(req,res)=>{
-    res.send('<h1> Home Page</h1><a href="/api/products">products</a>')
-})
+const people = require('./routes/people')
 
-app.get('/api/products/:productID',(req,res)=>{
-    //console.log(req)
-    //console.log(req.params)
-const {productID} = req.params;
+//static assets
+app.use(express.static('./methods-public'))
+//parse form data
+app.use(express.urlencoded({extended: false}))
+//parse json
+app.use(express.json())
 
-    const singleProduct = products.find(
-        (product)=> product.id === Number(productID)
-    )
-    if(!singleProduct){
-        return res.status(404).send('Product does not exit')
+app.use('/api/people',people)
+
+app.post('/login',(req,res)=>{
+    const {name} = req.body;
+    if(name){
+        return res.status(200).send(`Welcome ${name}`)
     }
-    res.json(singleProduct)
+    res.status(401).send('Please Provide Credentials')
 })
 
-app.listen(5000,()=>{
-    console.log('Server is listening on Port 5000')
+
+app.listen(5000,() =>{
+    console.log('Server is listening on port 5000....')
 })
